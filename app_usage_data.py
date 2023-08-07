@@ -112,6 +112,8 @@ def transfer_tracks():
             else:
                 tracks[i] = other_tracks[i]
                 del other_tracks[i]
+                if len(other_tracks) <= 0:
+                    other_burst = False
     totalOtherTime=0
 
     for i in other_tracks.values():
