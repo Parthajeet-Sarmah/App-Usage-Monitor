@@ -53,7 +53,7 @@ def get_active_window_process_name():
     except psutil.NoSuchProcess:
         pass
 
-tracks = {"Code.exe":2578}
+tracks = {}
 other_tracks = {}
 
 def calculate_total_time():
