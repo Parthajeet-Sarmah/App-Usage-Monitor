@@ -1,7 +1,7 @@
 #import pywinctl as pwc
 import win32gui, win32process
 import random
-from datetime import datetime
+import datetime
 import psutil
 import time
 import math
@@ -112,8 +112,6 @@ def transfer_tracks():
             else:
                 tracks[i] = other_tracks[i]
                 del other_tracks[i]
-                if len(other_tracks) <= 0:
-                    other_burst = False
     totalOtherTime=0
 
     for i in other_tracks.values():
@@ -158,13 +156,36 @@ def track_active_window_time():
         transfer_tracks()
         update_wallpaper(tracks)
 
+
+
+hms_values = []
+
+def convert_to_hms_value(value):
+    mintues, seconds = divmod(value, 60)
+    hours, mintues = divmod(mintues, 60)
+
+    h = "" if hours == 0 else str(hours) + "h"
+    m = "" if mintues == 0 else str(mintues) + "m"
+    s = "" if seconds == 0 or hours != 0 else str(seconds) + "s"
+
+    return h+m+s
+
 def generate_pie_chart(data):
     labels = list(data.keys())
     values = list(data.values())
 
+    for i in range(len(values)):
+        t = convert_to_hms_value(values[i])
+        if i < len(hms_values):
+            hms_values[i] = t
+        else:
+            hms_values.append(t)    
+
+    tt = convert_to_hms_value(calculate_total_time())
     imgpath = "C:\\wallpaper\\app_usage_pie.png"
-    fig = go.Figure(data=go.Pie(labels=labels, values=values, hole=0.3, texttemplate="%{value}s"))
-    fig.update_layout(template="plotly_dark", width=1920, height=1080, legend_font_size=20)
+    fig = go.Figure(data=go.Pie(labels=labels, values=values, hole=0.3, text=hms_values, textinfo="text"))
+    fig.update_layout(template="plotly_dark", width=1920, height=1080, legend_font_size=20,
+                      annotations=[dict(text=tt, x=0.5, y=0.5, font_size=30, showarrow=False)])
     fig.update_traces(textfont_color='white', textfont_size=20, marker=dict(colors=colors, line=dict(color='#ffffff', width=2)))
     fig.write_image(imgpath)
 
